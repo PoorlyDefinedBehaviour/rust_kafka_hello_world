@@ -6,5 +6,7 @@ members = [
   "shipping",
   "orders",
   "notifications",
-  "payments"
+  "payments",
+  "contracts",
+  "infra"
 ]

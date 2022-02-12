@@ -1,25 +1,15 @@
+use std::sync::Arc;
+
 use actix_cors::Cors;
-use actix_web::web::Json;
-use actix_web::{post, App, HttpResponse, HttpServer, Responder};
+
+use actix_web::{web::Data, HttpServer};
+use domain::App;
 use dotenv::dotenv;
-use serde::Deserialize;
-use tracing::instrument;
-use tracing::{debug, info};
+
 use tracing_actix_web::TracingLogger;
 
-#[derive(Debug, Deserialize)]
-struct CreateOrderInput {
-  product_id: String,
-  user_id: String,
-  quantity: i64,
-}
-
-#[post("/orders")]
-#[instrument]
-async fn create_order(order: Json<CreateOrderInput>) -> impl Responder {
-  info!("{:?}", order);
-  HttpResponse::Created()
-}
+mod domain;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -40,11 +30,37 @@ async fn main() -> std::io::Result<()> {
   let port = std::env::var("PORT").unwrap().parse::<u16>().unwrap();
 
   HttpServer::new(move || {
-    App::new()
+    let stream_processor = infra::kafka::Kafka::new(infra::kafka::Config {
+      group_id: env!("CARGO_PKG_NAME").to_string(),
+      bootstrap_servers: std::env::var("KAFKA_BOOTSTRAP_SERVERS").unwrap(),
+      enable_partition_eof: std::env::var("KAFKA_ENABLE_PARTITION_EOF")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap(),
+      session_timeout_ms: std::env::var("KAFKA_SESSION_TIMEOUT_MS")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap(),
+      message_timeout_ms: std::env::var("KAFKA_MESSAGE_TIMEOUT_MS")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap(),
+      enable_auto_commit: std::env::var("KAFKA_ENABLE_AUTO_COMMIT")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap(),
+      topics: std::env::var("KAFKA_TOPICS")
+        .unwrap()
+        .split(",")
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>(),
+    });
+
+    actix_web::App::new()
+      .app_data(Data::new(App::new(Box::new(stream_processor))))
       .wrap(TracingLogger)
-      // NOTE: we should only accept requests that come from our frontend.
       .wrap(Cors::permissive())
-      .service(create_order)
+      .configure(routes::init)
   })
   .bind((host, port))?
   .run()
