@@ -1,9 +1,9 @@
-use async_trait::async_trait;
+// use async_trait::async_trait;
 
-#[async_trait]
-pub trait Notify {}
+// #[async_trait]
+// pub trait Notify {}
 
-#[derive(Debug, PartialEq)]
-enum Message {
-  Sent {},
-}
+// #[derive(Debug, PartialEq)]
+// enum Message {
+//   Sent {},
+// }
