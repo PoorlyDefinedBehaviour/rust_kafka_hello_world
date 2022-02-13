@@ -3,6 +3,9 @@ use std::sync::Arc;
 use contracts::stream_processor::StreamProcessor;
 use domain::App;
 use dotenv::dotenv;
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::Registry;
 
 mod domain;
 
@@ -17,9 +20,15 @@ async fn main() {
 
   let (non_blocking_writer, _guard) = tracing_appender::non_blocking(std::io::stdout());
 
-  tracing_subscriber::fmt()
-    .with_writer(move || non_blocking_writer.clone())
-    .init();
+  let app_name = concat!(env!("CARGO_PKG_NAME"), "-", env!("CARGO_PKG_VERSION")).to_string();
+
+  let bunyan_formatting_layer = BunyanFormattingLayer::new(app_name, non_blocking_writer);
+
+  let subscriber = Registry::default()
+    .with(JsonStorageLayer)
+    .with(bunyan_formatting_layer);
+
+  tracing::subscriber::set_global_default(subscriber).unwrap();
 
   let stream_processor = infra::kafka::Kafka::new(infra::kafka::Config {
     group_id: env!("CARGO_PKG_NAME").to_string(),

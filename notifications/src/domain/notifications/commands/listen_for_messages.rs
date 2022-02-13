@@ -19,7 +19,7 @@ impl ListenForMessages {
   pub async fn execute(self: Arc<Self>) {
     info!("waiting for messages");
 
-    tokio::spawn(async move {
+    let _ = tokio::spawn(async move {
       loop {
         match self.stream_processor.recv().await {
           Err(e) => {
@@ -30,6 +30,7 @@ impl ListenForMessages {
           }
         }
       }
-    });
+    })
+    .await;
   }
 }

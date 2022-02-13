@@ -23,7 +23,6 @@ pub struct Config {
 }
 
 pub struct Kafka {
-  config: Config,
   consumer: StreamConsumer,
   producer: FutureProducer,
 }
@@ -57,11 +56,7 @@ impl Kafka {
       .create()
       .expect("unable to create kafka producer");
 
-    Self {
-      config,
-      consumer,
-      producer,
-    }
+    Self { consumer, producer }
   }
 }
 

@@ -8,6 +8,6 @@ edition = "2021"
 [dependencies]
 contracts = { path = "../contracts" }
 async-trait = "0.1.52"
-tracing = "0.1"
+tracing = "0.1.19"
 tracing-futures = "0.2.0"
 rdkafka = "0.28.0"
