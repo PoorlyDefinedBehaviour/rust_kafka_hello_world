@@ -1794,6 +1794,17 @@ dependencies = [
 [[package]]
 name = "shipping"
 version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "contracts",
+ "dotenv",
+ "infra",
+ "tokio 1.16.1",
+ "tracing",
+ "tracing-appender",
+ "tracing-futures",
+ "tracing-subscriber 0.2.25",
+]
 
 [[package]]
 name = "signal-hook-registry"

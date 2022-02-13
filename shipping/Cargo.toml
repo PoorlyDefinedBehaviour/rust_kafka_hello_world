@@ -6,3 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2.0"
+tracing-appender = "0.2.0"
+async-trait = "0.1.52"
+dotenv = "0.15.0"
+contracts = { path = "../contracts" }
+infra = { path = "../infra" }
+tokio = { version = "1.16.1", features = ["rt-multi-thread", "macros", "sync"] }
