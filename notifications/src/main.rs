@@ -45,5 +45,10 @@ async fn main() {
     Arc::new(stream_processor) as Arc<dyn StreamProcessor + Send + Sync>,
   );
 
-  tokio::spawn(app.commands.notifications.listen_for_messages.execute());
+  app
+    .commands
+    .notifications
+    .listen_for_messages
+    .execute()
+    .await;
 }

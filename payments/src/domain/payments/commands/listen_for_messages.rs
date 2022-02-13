@@ -4,13 +4,22 @@ use contracts::stream_processor::StreamProcessor;
 
 use tracing::{error, info, instrument};
 
+use super::process_payment::ProcessPayment;
+
 pub struct ListenForMessages {
   stream_processor: Arc<dyn StreamProcessor + Send + Sync>,
+  process_payment: ProcessPayment,
 }
 
 impl ListenForMessages {
-  pub fn new(stream_processor: Arc<dyn StreamProcessor + Send + Sync>) -> Self {
-    Self { stream_processor }
+  pub fn new(
+    stream_processor: Arc<dyn StreamProcessor + Send + Sync>,
+    process_payment: ProcessPayment,
+  ) -> Self {
+    Self {
+      stream_processor,
+      process_payment,
+    }
   }
 }
 
@@ -27,6 +36,7 @@ impl ListenForMessages {
           }
           Ok(message) => {
             info!("message received. message={:?}", &message);
+            self.process_payment.execute().await;
           }
         }
       }
