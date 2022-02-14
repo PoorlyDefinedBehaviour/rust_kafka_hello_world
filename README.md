@@ -1,4 +1,6 @@
-# TODO: add diagram
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17282221/153785558-7752d0c9-cb0d-4ab1-bba5-693e76e541de.png" />
+</p>
 
 ## Creating topics
 
