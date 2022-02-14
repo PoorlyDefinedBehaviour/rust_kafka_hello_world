@@ -17,7 +17,6 @@ pub fn init(config: &mut web::ServiceConfig) {
 #[post("/orders")]
 #[instrument(skip(app))]
 async fn create_order(app: Data<App>, order: Json<viewmodel::CreateOrderInput>) -> impl Responder {
-  info!("{:?}", order);
   app
     .commands
     .orders

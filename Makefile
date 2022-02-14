@@ -1,4 +1,4 @@
-.PHONY: create_topics start
+.PHONY: create_topics 
 
 create_topics:
 	docker exec kafka_hello_world_kafka kafka-topics --create --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1 --topic orders || true;

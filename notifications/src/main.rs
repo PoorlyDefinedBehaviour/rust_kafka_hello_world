@@ -1,4 +1,4 @@
-use contracts::stream_processor::StreamProcessor;
+use contracts::stream_processor::{SendInput, StreamProcessor};
 use domain::App;
 use dotenv;
 use std::sync::Arc;
@@ -28,6 +28,7 @@ async fn main() {
     .with(bunyan_formatting_layer);
 
   tracing::subscriber::set_global_default(subscriber).unwrap();
+
   let stream_processor = infra::kafka::Kafka::new(infra::kafka::Config {
     group_id: env!("CARGO_PKG_NAME").to_string(),
     bootstrap_servers: std::env::var("KAFKA_BOOTSTRAP_SERVERS").unwrap(),

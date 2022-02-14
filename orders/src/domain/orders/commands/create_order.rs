@@ -1,5 +1,5 @@
 use contracts::stream_processor::{SendInput, StreamProcessor};
-use tracing::instrument;
+use tracing::{info, instrument};
 
 pub struct CreateOrder {
   stream_processor: Box<dyn StreamProcessor>,
@@ -21,11 +21,13 @@ pub struct CreateOrderInput {
 impl CreateOrder {
   #[instrument(skip(self))]
   pub async fn execute(&self, input: CreateOrderInput) {
+    info!("publishing order event");
+
     self
       .stream_processor
       .send(SendInput {
         topic: String::from("orders"),
-        key: String::from("key"),
+        key: String::from("order_placed"),
         payload: String::from("hello world").as_bytes().to_vec(),
       })
       .await;

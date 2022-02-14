@@ -6,7 +6,6 @@ use rdkafka::{
   config::RDKafkaLogLevel,
   consumer::{Consumer, StreamConsumer},
   producer::{FutureProducer, FutureRecord},
-  util::Timeout,
   ClientConfig, Message,
 };
 use tracing::{info, instrument};
@@ -45,6 +44,8 @@ impl Kafka {
 
     let topics: Vec<&str> = config.topics.iter().map(|s| s.as_ref()).collect();
 
+    info!("subscring to topics. topics={:?}", &topics);
+
     consumer.subscribe(&topics).expect(&format!(
       "unable to subscribe to topics. topics={:?}",
       &config.topics
@@ -80,6 +81,7 @@ impl stream_processor::StreamProcessor for Kafka {
 
   #[instrument(skip(self))]
   async fn send(&self, message: stream_processor::SendInput) {
+    info!(topic = ?message.topic, key = ?message.key, "publishing event");
     // TODO: return values returned by rdkafka
     let result = self
       .producer
@@ -87,7 +89,7 @@ impl stream_processor::StreamProcessor for Kafka {
         FutureRecord::to(&message.topic)
           .payload(&message.payload)
           .key(&message.key),
-        Timeout::After(Duration::from_secs(0)),
+        Duration::from_secs(60),
       )
       .await;
 
